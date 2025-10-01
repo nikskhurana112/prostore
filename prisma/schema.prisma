@@ -8,13 +8,8 @@ datasource db {
 }
 
 model Product {
-  // This line defines the primary key field 'id' for the Product model.
-  // It is of type String, uses UUIDs as its value, and is automatically generated in the database using the gen_random_uuid() function.
   id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String
-  // This line defines a 'slug' field of type String for the Product model.
-  // The '@unique' attribute ensures that each product's slug is unique in the database, preventing duplicate slugs.
-  // The 'map: "product_slug_idx"' option names the unique index in the database as 'product_slug_idx'.
   slug        String   @unique(map: "product_slug_idx")
   category    String
   brand       String
@@ -25,119 +20,7 @@ model Product {
   numReviews  Int      @default(0)
   isFeatured  Boolean  @default(false)
   banner      String?
-  images      String[]
   createdAt   DateTime @default(now()) @db.Timestamp(6)
   updatedAt   DateTime @updatedAt
-}
-
-// The User model represents a user in your application.
-// Each field below defines a property of the user and how it is stored in the database.
-model User {
-  // Primary key: a unique identifier for each user, generated as a UUID.
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-
-  // The user's display name. Defaults to "NO_NAME" if not provided.
-  name String @default("NO_NAME")
-
-  // The user's email address. Must be unique in the database.
-  email String @unique(map: "user_email_idx")
-
-  // The date and time when the user's email was verified. Optional.
-  emailVerified DateTime? @db.Timestamp(6)
-
-  // URL or path to the user's profile image. Optional.
-  image String?
-
-  // The user's password (hashed). Optional (for OAuth users).
-  password String?
-
-  // The user's role (e.g., "user", "admin"). Defaults to "user".
-  role String @default("user")
-
-  // The user's address, stored as JSON. Optional.
-  address Json? @db.Json
-
-  // Timestamp when the user was created. Defaults to the current time.
-  createdAt DateTime @default(now()) @db.Timestamp(6)
-
-  // Timestamp when the user was last updated. Automatically updated.
-  updatedAt DateTime @updatedAt
-
-  // One-to-many relation: a user can have multiple accounts (for OAuth providers).
-  account Account[]
-
-  // One-to-many relation: a user can have multiple sessions (for authentication).
-  session Session[]
-}
-
-// The Account model stores OAuth account information for users (e.g., Google, GitHub).
-model Account {
-  // The ID of the user this account belongs to (foreign key).
-  userId String @db.Uuid
-
-  // The type of account (e.g., "oauth").
-  type String
-
-  // The name of the OAuth provider (e.g., "google", "github").
-  provider String
-
-  // The unique account ID from the provider.
-  providerAccountId String
-
-  // OAuth tokens and related fields. All are optional.
-  refresh_token String?
-  access_token  String?
-  expires_at    Int?
-  token_type    String?
-  scope         String?
-  id_token      String?
-  session_state String?
-
-  // Timestamp when the account was created.
-  createdAt DateTime @default(now()) @db.Timestamp(6)
-
-  // Timestamp when the account was last updated.
-  updatedAt DateTime @updatedAt
-
-  // Relation to the User model. When a user is deleted, their accounts are also deleted (Cascade).
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  // Composite primary key: ensures each provider/providerAccountId pair is unique.
-  @@id([provider, providerAccountId])
-}
-
-// The Session model stores active login sessions for users.
-model Session {
-  // The session token (primary key), used to identify the session.
-  sessionToken String @id
-
-  // The ID of the user this session belongs to (foreign key).
-  userId String @db.Uuid
-
-  // The date and time when the session expires.
-  expires DateTime @db.Timestamp(6)
-
-  // Relation to the User model. When a user is deleted, their sessions are also deleted (Cascade).
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  // Timestamp when the session was created.
-  createdAt DateTime @default(now()) @db.Timestamp(6)
-
-  // Timestamp when the session was last updated.
-  updatedAt DateTime @updatedAt
-}
-
-// The VerificationToken model is used for email verification and password reset flows.
-model VerificationToken {
-  // The identifier (e.g., email) for the verification.
-  identifier String
-
-  // The verification token itself.
-  token String
-
-  // The date and time when the token expires.
-  expires DateTime
-
-  // Composite primary key: ensures each identifier/token pair is unique.
-  @@id([identifier, token])
+  images      String[]
 }
